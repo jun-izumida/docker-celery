@@ -1,0 +1,11 @@
+*~
+*.swp
+*.bk
+
+.env
+
+__pycache__
+
+data/**
+
+!.gitkeep

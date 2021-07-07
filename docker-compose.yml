@@ -1,0 +1,28 @@
+version: "3"
+services:
+    redis:
+        image: ${REDIS_IMAGE}
+        container_name: ${CONTAINER_NAME_PREFIX}redis${CONTAINER_NAME_SUFFIX}
+        volumes:
+            - ${DATA_DIR}/redis:/data
+        expose:
+            - ${REDIS_PORT}
+
+    celery:
+        image: ${CELERY_IMAGE}
+        container_name: ${CONTAINER_NAME_PREFIX}celery${CONTAINER_NAME_SUFFIX}
+        environment:
+            - CELERY_BROKER_URL=redis://redis:${REDIS_PORT}
+        volumes:
+            - ${APP_DIR}:/app
+        working_dir: /app
+        command: 
+            sh -c 'celery -A tasks worker --loglevel=DEBUG'
+    flower:
+        image: ${FLOWER_IMAGE}
+        container_name: ${CONTAINER_NAME_PREFIX}flower${CONTAINER_NAME_SUFFIX}
+        environment:
+            - CELERY_BROKER_URL=redis://redis:${REDIS_PORT}
+            - FLOWER_PORT=${FLOWER_PORT}
+        ports:
+            - ${FLOWER_EXTERNAL_PORT}:${FLOWER_PORT}
